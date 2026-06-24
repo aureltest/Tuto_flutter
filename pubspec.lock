@@ -91,6 +91,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.2"
+  legal_wordle_words:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "4824e48510a657633d43415d61fd1f4c24eb6e92"
+      url: "https://github.com/ericwindmill/legal_wordle_words"
+    source: git
+    version: "1.0.0"
   lints:
     dependency: transitive
     description:

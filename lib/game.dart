@@ -8,6 +8,7 @@ library;
 
 import 'dart:collection';
 import 'dart:math';
+import 'package:legal_wordle_words/legal_wordle_words.dart';
 
 /// The result of evaluating a [Letter] of a guess against the hidden word.
 enum HitType {
@@ -29,23 +30,6 @@ typedef Letter = ({String char, HitType type});
 
 /// Every word that can be legally entered as a guess.
 const List<String> allLegalGuesses = [...legalWords, ...legalGuesses];
-
-/// Words that can be chosen as the hidden word.
-const List<String> legalWords = ['aback', 'abase', 'abate', 'abbey', 'abbot'];
-
-/// Additional words accepted as guesses beyond those in [legalWords].
-const List<String> legalGuesses = [
-  'aback',
-  'abase',
-  'abate',
-  'abbey',
-  'abbot',
-  'abhor',
-  'abide',
-  'abled',
-  'abode',
-  'abort',
-];
 
 /// Game state of a single round of Birdle,
 /// a five-letter word-guessing game similar to Wordle.

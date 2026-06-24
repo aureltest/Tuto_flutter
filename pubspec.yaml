@@ -9,6 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  legal_wordle_words:
+    git: https://github.com/ericwindmill/legal_wordle_words
 
 dev_dependencies:
   flutter_test:
