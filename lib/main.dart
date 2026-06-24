@@ -66,15 +66,40 @@ class _GamePageState extends State<GamePage> {
                   ),
               ],
             ),
-          GuessInput(
-            onSubmitGuess: (String guess) {
-              setState(() {
-                _game.guess(guess);
-              });
-              // TODO, handle guess
-              print(guess); // Temporary
-            },
-          ),
+          if (_game.didWin)
+            const Text(
+              'You win!',
+              style: TextStyle(fontSize: 24, color: Colors.green),
+            )
+          else if (_game.didLose)
+            const Text(
+              'You lose!',
+              style: TextStyle(fontSize: 24, color: Colors.red),
+            )
+          else
+            GuessInput(
+              onSubmitGuess: (String guess) {
+                if (guess.length != 5) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Guess must be 5 letters long.'),
+                    ),
+                  );
+                  return;
+                }
+                if (!Word.fromString(guess).isLegalGuess) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Guess is not a legal word.')),
+                  );
+                  return;
+                }
+                setState(() {
+                  _game.guess(guess);
+                });
+                // TODO, handle guess
+                print(guess); // Temporary
+              },
+            ),
         ],
       ),
     );
