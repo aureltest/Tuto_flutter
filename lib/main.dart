@@ -52,6 +52,7 @@ class _GamePageState extends State<GamePage> {
       padding: const EdgeInsets.all(8.0),
       child: Column(
         children: [
+          SizedBox(height: 30),
           for (var guess in _game.guesses)
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -66,39 +67,64 @@ class _GamePageState extends State<GamePage> {
                   ),
               ],
             ),
+          SizedBox(height: 30),
           if (_game.didWin)
             const Text(
               'You win!',
               style: TextStyle(fontSize: 24, color: Colors.green),
             )
           else if (_game.didLose)
-            const Text(
-              'You lose!',
-              style: TextStyle(fontSize: 24, color: Colors.red),
+            Column(
+              children: [
+                const Text(
+                  'You lose!',
+                  style: TextStyle(fontSize: 24, color: Colors.red),
+                ),
+                Text(
+                  'The word was: ${_game.hiddenWord}',
+                  style: const TextStyle(fontSize: 18, color: Colors.black),
+                ),
+              ],
             )
           else
             GuessInput(
               onSubmitGuess: (String guess) {
                 if (guess.length != 5) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Guess must be 5 letters long.'),
-                    ),
+                    SnackBar(content: Text('$guess must be 5 letters long.')),
                   );
                   return;
                 }
                 if (!Word.fromString(guess).isLegalGuess) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Guess is not a legal word.')),
+                    SnackBar(content: Text('$guess is not a legal word.')),
                   );
                   return;
                 }
                 setState(() {
                   _game.guess(guess);
                 });
-                // TODO, handle guess
-                print(guess); // Temporary
               },
+            ),
+          if (_game.didWin || _game.didLose)
+            Padding(
+              padding: EdgeInsetsGeometry.all(8.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    _game.resetGame();
+                  });
+                },
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.blue,
+                  textStyle: const TextStyle(
+                    fontFamily: 'Arial',
+                    fontSize: 22,
+                    fontWeight: FontWeight.w300,
+                  ),
+                ),
+                child: const Text('Play Again'),
+              ),
             ),
         ],
       ),
@@ -122,8 +148,10 @@ class GuessInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Expanded(
+        SizedBox(
+          width: 500,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
@@ -132,6 +160,8 @@ class GuessInput extends StatelessWidget {
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(35),
                 ),
+                filled: true,
+                fillColor: Colors.white,
               ),
               controller: _textEditingController,
               focusNode: _focusNode,
@@ -144,7 +174,8 @@ class GuessInput extends StatelessWidget {
         ),
         IconButton(
           padding: EdgeInsets.zero,
-          icon: const Icon(Icons.arrow_circle_up),
+          icon: const Icon(Icons.arrow_circle_up, color: Colors.white),
+          style: IconButton.styleFrom(iconSize: 50),
           onPressed: _onSubmit,
         ),
       ],
@@ -158,11 +189,17 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: 'Wordle',
       home: Scaffold(
+        backgroundColor: Colors.indigo.shade800,
         appBar: AppBar(
+          foregroundColor: Colors.indigo.shade800,
           title: const Align(
-            alignment: Alignment.centerLeft,
-            child: Text('Birdle'),
+            alignment: Alignment.center,
+            child: Text(
+              'Wordle',
+              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+            ),
           ),
         ),
         body: Center(child: GamePage()),
