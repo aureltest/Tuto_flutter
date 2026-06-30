@@ -162,6 +162,7 @@ class GuessInput extends StatelessWidget {
                 ),
                 filled: true,
                 fillColor: Colors.white,
+                counterText: '',
               ),
               controller: _textEditingController,
               focusNode: _focusNode,

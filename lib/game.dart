@@ -8,7 +8,7 @@ library;
 
 import 'dart:collection';
 import 'dart:math';
-import 'package:legal_wordle_words/legal_wordle_words.dart';
+import 'french_words.dart';
 
 /// The result of evaluating a [Letter] of a guess against the hidden word.
 enum HitType {
@@ -150,6 +150,55 @@ class Game {
       seed == null ? Word.random() : Word.fromSeed(seed);
 }
 
+/// Maps accented French characters to their ASCII equivalents.
+///
+/// Note that the ligatures `œ` and `æ` expand to two characters,
+/// so normalizing can change a string's length
+/// (for example `cœur` becomes `coeur`).
+const Map<String, String> _accentReplacements = {
+  'à': 'a',
+  'á': 'a',
+  'â': 'a',
+  'ä': 'a',
+  'ã': 'a',
+  'ç': 'c',
+  'è': 'e',
+  'é': 'e',
+  'ê': 'e',
+  'ë': 'e',
+  'ì': 'i',
+  'í': 'i',
+  'î': 'i',
+  'ï': 'i',
+  'ñ': 'n',
+  'ò': 'o',
+  'ó': 'o',
+  'ô': 'o',
+  'ö': 'o',
+  'õ': 'o',
+  'ù': 'u',
+  'ú': 'u',
+  'û': 'u',
+  'ü': 'u',
+  'ý': 'y',
+  'ÿ': 'y',
+  'œ': 'oe',
+  'æ': 'ae',
+};
+
+/// Returns [input] lowercased, trimmed, and stripped of French accents.
+///
+/// This lets the word list and the player's guesses be compared on a common
+/// accent-free basis, so typing `eleve` matches the hidden word `élève`.
+String normalizeWord(String input) {
+  final lower = input.toLowerCase().trim();
+  final buffer = StringBuffer();
+  for (final char in lower.split('')) {
+    buffer.write(_accentReplacements[char] ?? char);
+  }
+  return buffer.toString();
+}
+
 /// A five-letter word made up of [Letter]s, each tracking its [HitType].
 class Word with IterableMixin<Letter> {
   /// Creates a word backed by the specified list of [Letter]s.
@@ -161,19 +210,19 @@ class Word with IterableMixin<Letter> {
 
   /// Creates a [Word] from [guess].
   ///
-  /// Each character is lowercased,
-  /// every [Letter] starts as [HitType.none].
+  /// The guess is normalized (lowercased and stripped of accents) before
+  /// the five-letter check, every [Letter] starts as [HitType.none].
   factory Word.fromString(String guess) {
-    if (guess.length != 5) {
+    final normalized = normalizeWord(guess);
+    if (normalized.length != 5) {
       throw ArgumentError.value(
         guess,
         'guess',
-        'Must be exactly 5 characters long.',
+        'Must be exactly 5 letters long.',
       );
     }
 
-    final letters = guess
-        .toLowerCase()
+    final letters = normalized
         .split('')
         .map((char) => (char: char, type: HitType.none))
         .toList();
