@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'game.dart';
+import 'record.dart';
+import 'record_service.dart';
 
 void main() {
   runApp(const MainApp());
@@ -52,22 +54,30 @@ class _GamePageState extends State<GamePage> {
       padding: const EdgeInsets.all(8.0),
       child: Column(
         children: [
-          SizedBox(height: 30),
-          for (var guess in _game.guesses)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                for (var letter in guess)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 2.5,
-                      vertical: 2.5,
+          Expanded(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  for (var guess in _game.guesses)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        for (var letter in guess)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 2.5,
+                              vertical: 2.5,
+                            ),
+                            child: Tile(letter.char, letter.type),
+                          ),
+                      ],
                     ),
-                    child: Tile(letter.char, letter.type),
-                  ),
-              ],
+                ],
+              ),
             ),
-          SizedBox(height: 30),
+          ),
           if (_game.didWin)
             const Text(
               'You win!',
@@ -103,6 +113,7 @@ class _GamePageState extends State<GamePage> {
                 }
                 setState(() {
                   _game.guess(guess);
+
                 });
               },
             ),
@@ -112,6 +123,15 @@ class _GamePageState extends State<GamePage> {
               child: ElevatedButton(
                 onPressed: () {
                   setState(() {
+                    final record = Record(
+                      hiddenWord: _game.hiddenWord.toString(),
+                      lastGuess: _game.guesses.isNotEmpty
+                          ? _game.guesses.last.map((e) => e.char).join()
+                          : '',
+                      isWin: _game.didWin,
+                      score: _game.maxGuesses - _game.guessesRemaining,
+                    );
+                    RecordService().save(record);
                     _game.resetGame();
                   });
                 },
@@ -192,9 +212,10 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       title: 'Wordle',
       home: Scaffold(
-        backgroundColor: Colors.indigo.shade800,
+        backgroundColor: const Color.fromARGB(255, 23, 30, 82),
         appBar: AppBar(
-          foregroundColor: Colors.indigo.shade800,
+          backgroundColor: Colors.white,
+          foregroundColor: const Color.fromARGB(255, 23, 30, 82),
           title: const Align(
             alignment: Alignment.center,
             child: Text(
@@ -204,6 +225,28 @@ class MainApp extends StatelessWidget {
           ),
         ),
         body: Center(child: GamePage()),
+      ),
+    );
+  }
+}
+
+class HistoryPage extends StatefulWidget {
+  const HistoryPage({super.key});
+
+  @override
+  State<HistoryPage> createState() => _HistoryPageState();
+}
+
+class _HistoryPageState extends State<HistoryPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Game History'),
+      ),
+      body: FutureBuilder<List<Record>>(
+        future: RecordService().load(),
+        
       ),
     );
   }
